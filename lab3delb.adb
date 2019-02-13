@@ -5,23 +5,23 @@ with Ada.Numerics.Discrete_Random;
 
 procedure lab3delb is
    
-   type Ar_Type is array (1..20) of Integer;
-   type Matrix is array (1..2) of Ar_Type;
+   type Integer_Array is array (1..2) of Integer;
+   type Matrix is array (1..20) of Integer_Array;
    
-    --Underprogram för generering av nummer
-   procedure Generate_Numbers(Random_Ar : out Ar_Type) is
+   --Underprogram för generering av nummer
+   procedure Generate_Numbers(Random_Mat : out Matrix) is
       subtype Num is Integer range 1 .. 10;
       package Random_Num is 
 	 new Ada.Numerics.Discrete_Random(Result_Subtype => Num);
-         use Random_Num;
+      use Random_Num;
       G : Generator;
-      
-      --Något i Generate_Numbers måste redigerats för att ta hänsyn till matrisen och att den innehåller två fält med 20 nummer vardera. 
       
    begin
       Reset(G);
       for I in 1 .. 20 loop
-	 Random_Ar(I) := Random(G);
+	 for P in 1 .. 2 loop
+	    Random_Mat(I)(P) := Random(G);
+	 end loop;
 	 --Put(Random_Ar(I), Width => 1); (testline för generation)
 	 --New_Line;
       end loop;
@@ -37,36 +37,40 @@ procedure lab3delb is
    end Swap;
    
    --Underprogram för sortering av numren
-   procedure Sort(Ar : in out Ar_Type) is
-      begin
-	 for K in  2 .. 19 loop
-	    for I in reverse K .. 20 loop
-	       if Ar(I) < Ar(I-1) then
-		  Swap(Ar(I), Ar(I-1));
-	       end if;
-	    end loop;
+   --OBS att en rad lades till, och två redigerades, inför del B, så Sort är inte helt omodifierad. 
+   --Jag ser inte hur detta skulle kunna lösas genom en helt omodifierad "Sort(Ar)"-procedure, då talparen i sig inte hade bytt plats. Om bara det andra talet (Mat(I)(2)) hade behövt byta plats med föregående tal hade detta inte varit ett större problem, ty man hade kunnat deklarera Ar := Mat(I)(2); och köra med den tidigare Sort(Ar)-proceduren.
+   procedure Sort(Mat : in out Matrix) is
+   begin
+      for K in  2 .. 19 loop
+	 for I in reverse K .. 20 loop
+	    if Mat(I)(2) < Mat(I-1)(2) then
+	       Swap(Mat(I)(1), Mat(I-1)(1));
+	       Swap(Mat(I)(2), Mat(I-1)(2));
+	    end if;
 	 end loop;
-      end Sort;
-	      
-      Ar  : Ar_Type;
-      Mat : Matrix;
-   
-begin   
-   Generate_Numbers(Ar);
-      for I in 1 .. 20 loop
-	 for P in 1 .. 2 loop
-	    Put(Mat(Ar(I((P)), Width => 3)));
-	 end loop;
-	 New_Line;
       end loop;
+   end Sort;
+	      
+   Mat : Matrix;
+   
+begin  
+   Generate_Numbers(Mat);
    
    New_Line;
-   Put("Sortering av numren:");
+   for I in 1 .. 20 loop
+      Put(Mat(I)(1), Width => 3);
+      Put(Mat(I)(2), Width => 5);
+      New_Line;
+   end loop;
+   
+   New_Line;
+   Put("Sortering av talen:");
    New_Line;
    
-   Sort(Ar);
-   for I in 1 .. 40 loop
-      Put(Ar(I), Width => 1);
+   Sort(Mat);
+   for I in 1 .. 20 loop
+      Put(Mat(I)(1), Width => 3);
+      Put(Mat(I)(2), Width => 5);
       New_Line;
    end loop;
       
